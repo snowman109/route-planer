@@ -158,7 +158,7 @@ function start() {
     let city = GetQueryString('city')
     let type = GetQueryString('type')
     $.get({
-        "url": "http://10.112.255.29:5000/roadmap/json?city=" + city + "&type=" + type,
+        "url": "http://127.0.0.1:8888/roadmap/json?city=" + city + "&type=" + type,
         success: function (resp) {
             mapDataJson = resp;
             simulation = mapDataJson;

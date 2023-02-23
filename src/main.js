@@ -10,6 +10,7 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.prototype.$http = axios
 axios.defaults.baseURL = GlobalRules.URL
+
 Vue.prototype.GLOBAL = GlobalRules
 Vue.prototype.openTips = function (title, text, type) {
   const h = this.$createElement;

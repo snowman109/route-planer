@@ -12,42 +12,29 @@
         下载地图
       </button>
     </div>
-    <el-dialog
-      title="提示"
-      :visible.sync="dialogVisible"
-      width="30%"
-      :before-close="handleClose"
-    >
+    <el-dialog title="下载" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
       <el-form ref="form" label-width="80px">
         <el-form-item label="城市">
           <el-input v-model="city"></el-input>
         </el-form-item>
-        <el-form-item label="类型">
-          <el-input v-model="type"></el-input>
+        <el-form-item label="地图id">
+          <el-input v-model="nameId"></el-input>
         </el-form-item>
         <el-form-item label="坐标">
           <span>{{ LatLonPath }}</span>
         </el-form-item>
         <el-form-item label="进度">
           <el-timeline :reverse="false">
-            <el-timeline-item
-              v-for="(proc, index) in process"
-              :key="index"
-              :timestamp="proc.timestamp"
-              :color="proc.color"
-            >
+            <el-timeline-item v-for="(proc, index) in process" :key="index" :timestamp="proc.timestamp"
+              :color="proc.color">
               {{ proc.content }}
             </el-timeline-item>
           </el-timeline>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" :disabled="cancelDisabled"
-          >取 消</el-button
-        >
-        <el-button type="primary" @click="submit" :loading="commitLoading"
-          >确 定</el-button
-        >
+        <el-button @click="dialogVisible = false; cancelHide='取消'">{{cancelHide}}</el-button>
+        <el-button type="primary" @click="submit" :loading="commitLoading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -64,10 +51,10 @@ export default {
       polygon: null,
       dialogVisible: false,
       city: "",
-      type: "",
+      nameId: "",
       process: [],
       commitLoading: false,
-      cancelDisabled: false,
+      cancelHide: '取消',
     };
   },
   mounted() {
@@ -80,7 +67,7 @@ export default {
         .then((_) => {
           done();
         })
-        .catch((_) => {});
+        .catch((_) => { });
     },
     initProcess() {
       this.process = [
@@ -95,7 +82,7 @@ export default {
           color: "#e4e7ed",
         },
         {
-          content: "已生成python图片",
+          content: "已生成坐标系图",
           timestamp: "-",
           color: "#e4e7ed",
         },
@@ -105,17 +92,17 @@ export default {
           color: "#e4e7ed",
         },
         {
-          content: "已转化cityflow路网",
+          content: "已转化JSON路网",
           timestamp: "-",
           color: "#e4e7ed",
         },
         {
-          content: "已生成directed图片",
+          content: "已生成点线拓扑图",
           timestamp: "-",
           color: "#e4e7ed",
         },
         {
-          content: "已生成cityflow画图文件",
+          content: "已生成可搜索图",
           timestamp: "-",
           color: "#e4e7ed",
         },
@@ -129,11 +116,11 @@ export default {
     submit() {
       let data = {
         city: this.city,
-        type: this.type,
+        nameId: this.nameId,
         coordinate: [],
       };
       console.log(this.city);
-      console.log(this.type);
+      console.log(this.nameId);
       for (let i = 0; i < this.LatLonPath.length; i++) {
         let coordinate = [];
         let position = this.LatLonPath[i];
@@ -144,20 +131,29 @@ export default {
       }
       let finish = false;
       this.commitLoading = true;
-      this.cancelDisabled = true;
+      this.cancelHide = '隐藏';
       this.$http.post("/roadmap", data).then((response) => {
-        that.dialogVisible = false;
-        finish = true;
+        // that.dialogVisible = false;
+        // finish = true;
+      }).catch((err) => {
+        this.errorTips(err.response, "创建失败");
+        return;
       });
       let that = this;
       this.initProcess();
       const innertimer = setInterval(function () {
-        that.$http.get("/roadmap/create/stats").then((res) => {
+        that.$http.get("/roadmap/create/stats?city=" + that.city + "&nameId=" + that.nameId).then((res) => {
           console.log(res.data);
           for (let p in res.data.process) {
             that.process[p].color = "#0bbd87";
             that.process[p].timestamp = res.data.process[p].timestamp;
           }
+          if (res.data.process.length == that.process.length) {
+            finish = true;
+            that.dialogVisible = false;
+          }
+        }).catch((err) => {
+          this.errorTips(err.response, "创建失败");
         });
         if (finish) {
           clearInterval(innertimer);
@@ -215,6 +211,17 @@ export default {
       this.initProcess();
       this.dialogVisible = true;
     },
+    errorTips: function (res, type) {
+      if (res.status === 401) {
+        this.openTips(type, "缺少权限", "error");
+      } else if (res.status === 402) {
+        this.openTips("登录状态丢失，请重新登录", "", "error");
+      } else if (res.status === 500) {
+        this.openTips(type, "服务器问题，请稍后再试", "error");
+      } else {
+        this.openTips(type, res.data, "error");
+      }
+    },
   },
 };
 </script>
@@ -227,6 +234,7 @@ export default {
   height: 100%;
   overflow: visible;
 }
+
 .input-card {
   display: flex;
   flex-direction: column;
@@ -247,6 +255,7 @@ export default {
   padding: 0.75rem 1.25rem;
   z-index: 999;
 }
+
 /* .input-card button{
   z-index: 999;
 } */

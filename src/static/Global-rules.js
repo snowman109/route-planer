@@ -1,9 +1,9 @@
 /**
  * Created by MangoGan on 2018/5/31.
  */
-const IP = '10.112.255.29',
+const IP = '127.0.0.1',
     // const IP = '127.0.0.1',
-    PORT = '5000',
+    PORT = '8888',
     URL = "http://" + IP + ":" + PORT;
 
 //实现对象的深拷贝

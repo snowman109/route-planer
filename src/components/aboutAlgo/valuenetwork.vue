@@ -1,46 +1,25 @@
 <template>
-  <div
-    style="
+  <div style="
       height: 100%;
       width: 100%;
       margin-top: 0px;
       padding-top: 0px;
       position: relative;
-    "
-  >
+    ">
     <el-dialog title="训练网络" :visible.sync="trainVisible" width="30%">
       <el-form ref="form" label-width="80px">
         <el-form-item label="路网">
           <span>{{ citySelected }}</span>
         </el-form-item>
         <el-form-item label="车流数">
-          <el-select
-            v-model="flowSelected"
-            @change="chooseDataset"
-            placeholder="请选择车流"
-            :disabled="flowDisable"
-          >
-            <el-option
-              v-for="item in flow"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select v-model="flowSelected" @change="chooseDataset" placeholder="请选择车流" :disabled="flowDisable">
+            <el-option v-for="item in flow" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="数据集">
-          <el-select
-            v-model="datasetSelected"
-            multiple
-            placeholder="请选择数据集"
-          >
-            <el-option
-              v-for="item in dataset"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select v-model="datasetSelected" multiple placeholder="请选择数据集">
+            <el-option v-for="item in dataset" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -55,12 +34,7 @@
         </el-form-item>
         <el-form-item label="device">
           <el-select v-model="deviceSelected" placeholder="请选择设备">
-            <el-option
-              v-for="item in devices"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+            <el-option v-for="item in devices" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -72,82 +46,63 @@
     </el-dialog>
     <div class="view-head">
       <span style="margin-right: 20px; margin-left: 50px"> 路网 </span>
-      <el-cascader
-        v-model="citySelected"
-        :options="city"
-        :props="{ expandTrigger: 'hover' }"
-        style="margin-right: 50px"
-      >
+      <el-cascader v-model="citySelected" :options="city" :props="{ expandTrigger: 'hover' }"
+        style="margin-right: 50px">
       </el-cascader>
-      <el-button round style="margin-left: 300px" @click="submit"
-        >确定</el-button
-      >
-      <el-button round style="margin-left: 20px" @click="showTrainDialog"
-        >训练网络</el-button
-      >
+      <el-button round style="margin-left: 300px" @click="submit">确定</el-button>
+      <el-button round style="margin-left: 20px" @click="showTrainDialog">训练网络</el-button>
     </div>
     <div class="view-body">
       <el-table :data="valuenet" height="100%" border style="width: 100%">
         <el-table-column prop="city" label="路网" width="100">
         </el-table-column>
-        <el-table-column prop="type" label="type" width="100">
+        <el-table-column prop="nameId" label="nameId" width="100">
         </el-table-column>
-        <el-table-column prop="flow" label="车流" width="100">
+        <el-table-column prop="flowId" label="车流" width="100">
         </el-table-column>
-        <el-table-column prop="path" label="path"> </el-table-column>
-        <el-table-column prop="createTime" label="createTime" width="100">
+        <el-table-column prop="path" label="网络路径" width='300'> </el-table-column>
+        <el-table-column prop="createTime" label="开始时间" width="100">
         </el-table-column>
-        <el-table-column prop="finishTime" label="finishTime" width="100">
+        <el-table-column prop="finishTime" label="结束时间" width="100">
         </el-table-column>
-        <el-table-column prop="loss" label="loss" width="100">
+        <el-table-column prop="loss" label="损失" width="100">
         </el-table-column>
-        <el-table-column prop="trainSize" label="trainSize" width="100">
+        <el-table-column label="损失图片" width="100">
+          <template slot-scope="scope">
+            <el-popover placement="right" width="300" trigger="click">
+              <img :src="require('../../assets/loss.png')"
+                style="max-width: 300px; max-height: 300px;"></img>
+              <el-button circle slot="reference">show</el-button>
+            </el-popover>
+          </template>
         </el-table-column>
-        <el-table-column prop="learnRate" label="learnRate" width="100">
+        <el-table-column prop="trainSize" label="训练集大小" width="100">
         </el-table-column>
-        <el-table-column prop="numEpoch" label="Epoch" width="100">
+        <el-table-column prop="learnRate" label="学习率" width="100">
+        </el-table-column>
+        <el-table-column prop="epoch" label="总轮次" width="70">
         </el-table-column>
         <el-table-column prop="batchSize" label="batchSize" width="100">
         </el-table-column>
         <el-table-column prop="maxLabel" label="maxLabel" width="100">
         </el-table-column>
-        <el-table-column label="lossImage" width="100">
-          <template slot-scope="scope">
-            <el-button circle @click="showLoss(scope)">show</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="status" width="100">
+        <el-table-column prop="status" label="状态" width="70">
         </el-table-column>
         <el-table-column label="log" width="100">
           <template slot-scope="scope">
-            <el-popover
-              placement="right"
-              width="600"
-              trigger="click"
-              @show="logShow(scope)"
-              @hide="logHide()"
-            >
+            <el-popover placement="right" width="600" trigger="click" @show="logShow(scope)" @hide="logHide()">
               <el-table :data="logData" height="500">
-                <el-table-column
-                  width="160"
-                  property="time"
-                  label="时间"
-                ></el-table-column>
-                <el-table-column
-                  width="440"
-                  property="content"
-                  label="内容"
-                ></el-table-column>
+                <el-table-column width="160" property="time" label="时间"></el-table-column>
+                <el-table-column width="440" property="content" label="内容"></el-table-column>
               </el-table>
               <el-button circle slot="reference">click 激活</el-button>
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column label="operate" width="100">
+        <el-table-column label="operate" width="200">
           <template slot-scope="scope">
-            <el-button circle @click="updateNeural(scope.row)"
-              >update</el-button
-            >
+            <el-button @click="updateNeural(scope.row)">update</el-button>
+            <el-button type="danger" style="margin-left: 5px;" @click="deleteNeural(scope.row)">delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -191,11 +146,11 @@ export default {
         that.$http
           .get(
             "/valuenet/log?city=" +
-              data.city +
-              "&type=" +
-              data.type +
-              "&flow=" +
-              data.flow
+            data.city +
+            "&nameId=" +
+            data.nameId +
+            "&flowId=" +
+            data.flowId
           )
           .then((resp) => {
             for (let i = that.logData.length; i < resp.data.logs.length; i++) {
@@ -219,7 +174,7 @@ export default {
       this.getValuenet();
     },
     showLoss(scope) {
-      let url = scope.row.lossImage;
+      let url = scope.row.lossPath;
       window.open(this.GLOBAL.URL + "/valuenet/image?url=" + url);
     },
     showTrainDialog() {
@@ -240,8 +195,8 @@ export default {
         .then((res) => {
           for (let i in res.data.devices) {
             this.devices.push({
-              label: res.data.devices[i],
-              value: res.data.devices[i],
+              label: res.data.devices[i].name + ", 显存使用率" + (res.data.devices[i].used * 100).toFixed(2) + "%",
+              value: res.data.devices[i].name,
             });
           }
         })
@@ -256,17 +211,17 @@ export default {
       }
       this.$http
         .get(
-          "/dataset/flow?city=" +
-            this.citySelected[0] +
-            "&type=" +
-            this.citySelected[1]
+          "/flow/query?city=" +
+          this.citySelected[0] +
+          "&nameId=" +
+          this.citySelected[1]
         )
         .then((resp) => {
           // console.log(resp);
           for (let flow in resp.data.flows) {
             let tmp = {
-              label: resp.data.flows[flow]["name"],
-              value: resp.data.flows[flow]["nums"],
+              label: resp.data.flows[flow]["flowId"],
+              value: resp.data.flows[flow]["flowId"],
             };
             this.flow.push(tmp);
           }
@@ -275,31 +230,6 @@ export default {
           this.errorTips(err.response, "获取失败");
         });
     },
-    // trainNeural() {
-    //   let data = {
-    //     city: this.citySelected[0],
-    //     type: this.citySelected[1],
-    //     flow: this.flowSelected,
-    //     tGap: this.datasetSelected,
-    //     epoch: this.epoch,
-    //     batch_size: this.batchSize,
-    //     lr: this.lr,
-    //     device: this.deviceSelected,
-    //   };
-    //   console.log(data);
-    //   this.$http
-    //     .post("/valuenet", data)
-    //     .then((resp) => {
-    //       this.trainVisible = false;
-    //       this.getValuenet();
-    //     })
-    //     .catch((err) => {
-    //       this.errorTips(err.response, "创建失败");
-    //     });
-    //   this.flow = [];
-    //   this.devices = [];
-    //   this.dataset = [];
-    // },
     chooseDataset() {
       // todo 根据所选的路网和车流获取数据集
       this.getDatasets();
@@ -318,11 +248,11 @@ export default {
       this.$http
         .get(
           "/dataset?city=" +
-            this.citySelected[0] +
-            "&type=" +
-            this.citySelected[1] +
-            "&flow=" +
-            this.flowSelected
+          this.citySelected[0] +
+          "&nameId=" +
+          this.citySelected[1] +
+          "&flowId=" +
+          this.flowSelected
         )
         .then((resp) => {
           console.log(resp);
@@ -331,10 +261,10 @@ export default {
               this.dataset.push({
                 label:
                   "t_gap: " +
-                  resp.data.dataset[i].t_gap +
+                  resp.data.dataset[i].tGap +
                   " size:" +
                   resp.data.dataset[i].size,
-                value: resp.data.dataset[i].t_gap,
+                value: resp.data.dataset[i].tGap,
               });
             }
           }
@@ -343,36 +273,50 @@ export default {
     updateNeural(data) {
       this.flowDisable = true;
       this.batchSizeDisable = true;
-      this.citySelected = [data.city, data.type];
-      this.flowSelected = data.flow;
+      this.citySelected = [data.city, data.nameId];
+      this.flowSelected = data.flowId;
       this.batchSize = data.batchSize;
       this.trainVisible = true;
       this.getDevices();
       this.getDatasets();
     },
+    deleteNeural(data) {
+      let city = data.city
+      let nameId = data.nameId
+      let flowId = data.flowId
+      let that = this
+      this.$http.delete("/valuenet?city=" + city + "&nameId=" + nameId + "&flowId=" + flowId)
+        .then((resp) => {
+          this.openTips("删除成功", "", "success")
+          that.getValuenet()
+        })
+        .catch((err) => {
+          this.errorTips(err.response, "删除失败")
+        })
+    },
     getValuenet() {
       let city = this.citySelected[0];
-      let type = this.citySelected[1];
+      let nameId = this.citySelected[1];
       this.valuenet = [];
       this.$http
-        .get("/valuenet?city=" + city + "&type=" + type)
+        .get("/valuenet?city=" + city + "&nameId=" + nameId)
         .then((res) => {
           for (let i in res.data.valuenet) {
             let tmp = res.data.valuenet[i];
             this.valuenet.push({
               city: tmp.city,
-              type: tmp.type,
-              flow: tmp.flow,
+              nameId: tmp.nameId,
+              flowId: tmp.flowId,
               path: tmp.path,
               createTime: tmp.createTime,
               finishTime: tmp.finishTime,
               loss: tmp.loss,
               trainSize: tmp.trainSize,
               learnRate: tmp.learnRate,
-              numEpoch: tmp.numEpoch,
+              epoch: tmp.epoch,
               batchSize: tmp.batchSize,
               maxLabel: tmp.maxLabel,
-              lossImage: tmp.lossImage,
+              lossPath: tmp.lossPath,
               status: tmp.status,
               version: tmp.version,
             });
@@ -384,10 +328,10 @@ export default {
     },
     createValuenet() {
       let city = this.citySelected[0];
-      let type = this.citySelected[1];
-      let flow = this.flowSelected;
+      let nameId = this.citySelected[1];
+      let flowId = this.flowSelected;
       let dataset = this.datasetSelected;
-      if (city == "" || type == "" || flow == 0 || dataset.length == 0) {
+      if (city == "" || nameId == "" || flowId == 0 || dataset.length == 0) {
         this.openTips("未选择城市或车流或dataset", "创建失败", "error");
         return;
       }
@@ -405,8 +349,8 @@ export default {
       }
       let data = {
         city: this.citySelected[0],
-        type: this.citySelected[1],
-        flow: this.flowSelected,
+        nameId: this.citySelected[1],
+        flowId: this.flowSelected,
         tGap: this.datasetSelected,
         epoch: this.epoch,
         batch_size: this.batchSize,
@@ -437,10 +381,10 @@ export default {
               value: city,
               children: [],
             };
-            for (let type in response.data[city]) {
+            for (let nameId in response.data[city]) {
               tmp.children.push({
-                label: response.data[city][type],
-                value: response.data[city][type],
+                label: response.data[city][nameId],
+                value: response.data[city][nameId],
               });
             }
             this.city.push(tmp);
@@ -477,6 +421,7 @@ export default {
   /*实现水平居中*/
   justify-content: left;
 }
+
 .view-body {
   width: 100%;
   /* height: auto; */

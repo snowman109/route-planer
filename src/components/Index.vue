@@ -3,26 +3,17 @@
     <header class="Index-header">
       <span class="Index-header-span">面向数字孪生的交通态势演化系统</span>
     </header>
-    <section style="height: 93%">
+    <div style="height: 93%">
       <el-container style="height: 100%; width: 100%">
         <el-aside class="Index-section-aside" width="200px" height="100%">
-          <el-menu
-            class="el-menu-demo"
-            background-color="#fff"
-            text-color="#415058"
-            active-text-color="#1684FC"
-            :default-active="$route.path"
-          >
+          <el-menu class="el-menu-demo" background-color="#fff" text-color="#415058" active-text-color="#1684FC"
+            :default-active="$route.path">
             <el-submenu :index="i + ''" :key="i" v-for="(item, i) in leftNav">
               <template slot="title">
                 <i v-bind:class="[item.icon]"></i>
                 <span>{{ item.name }}</span>
               </template>
-              <el-menu-item
-                :index="inner.url"
-                :key="i"
-                v-for="(inner, i) in item.child"
-              >
+              <el-menu-item :index="inner.url" :key="i" v-for="(inner, i) in item.child">
                 <router-link tag="li" :to="inner.url">
                   <span>{{ inner.name }}</span>
                 </router-link>
@@ -34,7 +25,7 @@
           <router-view></router-view>
         </el-main>
       </el-container>
-    </section>
+    </div>
   </div>
 </template>
 <script>
@@ -44,27 +35,30 @@ export default {
     return {
       leftNav: [
         {
-          name: "路网相关",
+          name: "数据导入模块",
           child: [
-            { url: "/aboutNetwork/view", name: "预览路网" },
-            { url: "/aboutNetwork/generate", name: "生成路网" },
+            { url: "/dataImport/roadmap/view", name: "预览路网" },
+            { url: "/dataImport/roadmap/generate", name: "生成路网" },
+            { url: "/dataImport/roadmap/manage", name: "管理路网" },
+            { url: "/dataImport/flow/", name: "车流" },
           ],
           icon: "el-icon-discover",
         },
         {
-          name: "算法相关",
+          name: "算法执行模块",
           child: [
-            { url: "/aboutAlgo/dataset", name: "数据集" },
-            { url: "/aboutAlgo/valuenetwork", name: "价值网络" },
-            { url: "/aboutAlgo/mcts", name: "蒙特卡洛树搜索" },
-            { url: "/aboutAlgo/visualization", name: "可视化" },
+            { url: "/algo/dataset", name: "数据集" },
+            { url: "/algo/valuenetwork", name: "价值网络" },
+            { url: "/algo/mcts", name: "态势推演算法" },            
           ],
           icon: "el-icon-cpu",
         },
         {
-          name: "配置相关",
-          child: [{ url: "/aboutConfig/unknown", name: "没想好呢" }],
-          icon: "el-icon-edit",
+          name: "结果可视化模块",
+          child: [{ url: "/result/table", name: "结果对比" },
+          { url: "/result/route", name: "路网热力图" },
+          { url: "/result/tree", name: "搜索树" }],
+          icon: "el-icon-picture-outline-round",
         },
       ],
     };
@@ -74,13 +68,16 @@ export default {
 <style scoped>
 .Index-header {
   width: 100%;
-  height: 80px;
-  background: rgb(38, 224, 253);
+  height: 60px;
+  background: rgb(115, 171, 232);
 }
+
 .Index-header-span {
-  line-height: 80px;
+  line-height: 60px;
   font-size: 24px;
+  color: #ffffff;
 }
+
 .Index-section-aside {
   background-color: #ffffff;
   color: #415058;
@@ -88,6 +85,7 @@ export default {
   height: 100%;
   /* width: 100%; */
 }
+
 .Index-section-main {
   height: 100%;
   /* width: 92%; */

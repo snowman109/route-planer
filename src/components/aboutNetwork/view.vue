@@ -12,7 +12,7 @@
     </div>
     <div class="view-body">
       <el-tabs type="border-card" style="height: 100%">
-        <el-tab-pane label="cityflow" class="cityflow-view">
+        <el-tab-pane label="可搜索图" class="cityflow-view">
           <template>
             <div>
               <iframe
@@ -24,7 +24,7 @@
             </div>
           </template>
         </el-tab-pane>
-        <el-tab-pane label="有向图">
+        <el-tab-pane label="点线拓扑图">
           <el-image
             class="image"
             :fit="fit"
@@ -32,7 +32,7 @@
             :preview-src-list="directedList"
           ></el-image>
         </el-tab-pane>
-        <el-tab-pane label="python图">
+        <el-tab-pane label="坐标系图">
           <el-image
             class="image"
             :fit="fit"
@@ -52,21 +52,6 @@ export default {
       fit: "fill",
       iframeSrc: "",
       city: [
-        {
-          label: "manhattan",
-          value: "manhattan",
-          children: [{ value: "1环", label: "1环" }],
-        },
-        {
-          label: "beijing",
-          value: "beijing",
-          children: [{ value: "1环", label: "2环" }],
-        },
-        {
-          label: "jinan",
-          value: "jinan",
-          children: [{ value: "1环", label: "3环" }],
-        },
       ],
       citySelected: "",
       cityDirectedGraph: "",
@@ -169,9 +154,9 @@ export default {
   padding: 0;
 }
 .image {
-  height: 500px;
-  width: 500px;
-  margin-top: 13%;
+  height: 600px;
+  width: 600px;
+  margin-top: 0%;
 }
 </style>
 <style>
